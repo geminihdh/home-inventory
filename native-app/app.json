@@ -18,8 +18,8 @@
       },
       "predictiveBackGestureEnabled": false
     },
-    "web": {
-      "favicon": "./assets/favicon.png"
+    "widgets": {
+      "enabled": true
     }
   }
 }
