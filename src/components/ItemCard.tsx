@@ -2,9 +2,10 @@ import type { InventoryItem } from '../db/schema';
 
 interface ItemCardProps {
   item: InventoryItem;
+  onClick: (item: InventoryItem) => void;
 }
 
-export function ItemCard({ item }: ItemCardProps) {
+export function ItemCard({ item, onClick }: ItemCardProps) {
   const calculateDDay = (expiryDate: string) => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -37,7 +38,10 @@ export function ItemCard({ item }: ItemCardProps) {
   const dDay = item.expiryDate ? calculateDDay(item.expiryDate) : null;
 
   return (
-    <div className={`item-card ${status === 'expired' ? 'card-expired' : ''}`}>
+    <div 
+      className={`item-card ${status === 'expired' ? 'card-expired' : ''}`}
+      onClick={() => onClick(item)}
+    >
       <div className="item-image-container">
         {item.image ? (
           <img src={item.image} alt={item.name} className="item-image" />

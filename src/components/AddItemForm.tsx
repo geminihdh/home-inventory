@@ -1,13 +1,14 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { Camera, X, Save } from 'lucide-react';
 import type { InventoryItem } from '../db/schema';
-import { addItem } from '../db/inventory';
+import { addItem, updateItem } from '../db/inventory';
 import { resizeImage } from '../utils/image';
 
 interface AddItemFormProps {
   onItemAdded: () => void;
   onCancel: () => void;
+  initialItem?: InventoryItem;
 }
 
 const COMMON_LOCATIONS = [
@@ -23,17 +24,25 @@ const COMMON_LOCATIONS = [
   '창고'
 ];
 
-export const AddItemForm: React.FC<AddItemFormProps> = ({ onItemAdded, onCancel }) => {
-  const [name, setName] = useState('');
-  const [description, setDescription] = useState('');
-  const [location, setLocation] = useState('');
-  const [customLocation, setCustomLocation] = useState('');
-  const [purchaseDate, setPurchaseDate] = useState('');
-  const [expiryDate, setExpiryDate] = useState('');
-  const [memo, setMemo] = useState('');
-  const [image, setImage] = useState<string | null>(null);
+export const AddItemForm: React.FC<AddItemFormProps> = ({ onItemAdded, onCancel, initialItem }) => {
+  const [name, setName] = useState(initialItem?.name || '');
+  const [description, setDescription] = useState(initialItem?.description || '');
+  const [location, setLocation] = useState(initialItem?.location || '');
+  const [customLocation, setCustomLocation] = useState(
+    initialItem && !COMMON_LOCATIONS.includes(initialItem.location) ? initialItem.location : ''
+  );
+  const [purchaseDate, setPurchaseDate] = useState(initialItem?.purchaseDate || '');
+  const [expiryDate, setExpiryDate] = useState(initialItem?.expiryDate || '');
+  const [memo, setMemo] = useState(initialItem?.memo || '');
+  const [image, setImage] = useState<string | null>(initialItem?.image || null);
   const [isResizing, setIsResizing] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (initialItem && !COMMON_LOCATIONS.includes(initialItem.location) && initialItem.location !== '') {
+      setLocation('Other');
+    }
+  }, [initialItem]);
 
   const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -60,8 +69,8 @@ export const AddItemForm: React.FC<AddItemFormProps> = ({ onItemAdded, onCancel 
 
     const finalLocation = customLocation || location;
 
-    const newItem: InventoryItem = {
-      id: uuidv4(),
+    const itemData: InventoryItem = {
+      ...(initialItem || { id: uuidv4(), createdAt: Date.now() }),
       name: name.trim(),
       description: description.trim(),
       location: finalLocation,
@@ -69,14 +78,17 @@ export const AddItemForm: React.FC<AddItemFormProps> = ({ onItemAdded, onCancel 
       expiryDate,
       memo: memo.trim(),
       image: image || '',
-      createdAt: Date.now(),
     };
 
     try {
-      await addItem(newItem);
+      if (initialItem) {
+        await updateItem(itemData);
+      } else {
+        await addItem(itemData);
+      }
       onItemAdded();
     } catch (error) {
-      console.error('Failed to add item:', error);
+      console.error('Failed to save item:', error);
       alert('저장 중 오류가 발생했습니다.');
     }
   };
@@ -84,7 +96,7 @@ export const AddItemForm: React.FC<AddItemFormProps> = ({ onItemAdded, onCancel 
   return (
     <form className="add-item-form" onSubmit={handleSubmit}>
       <div className="form-header">
-        <h2>새 품목 추가</h2>
+        <h2>{initialItem ? '품목 수정' : '새 품목 추가'}</h2>
         <button type="button" className="icon-button" onClick={onCancel}>
           <X size={24} />
         </button>

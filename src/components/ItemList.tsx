@@ -3,9 +3,10 @@ import { ItemCard } from './ItemCard';
 
 interface ItemListProps {
   items: InventoryItem[];
+  onItemClick: (item: InventoryItem) => void;
 }
 
-export function ItemList({ items }: ItemListProps) {
+export function ItemList({ items, onItemClick }: ItemListProps) {
   if (items.length === 0) {
     return (
       <div className="empty-state">
@@ -18,7 +19,7 @@ export function ItemList({ items }: ItemListProps) {
   return (
     <div className="item-list">
       {items.map((item) => (
-        <ItemCard key={item.id} item={item} />
+        <ItemCard key={item.id} item={item} onClick={onItemClick} />
       ))}
     </div>
   );

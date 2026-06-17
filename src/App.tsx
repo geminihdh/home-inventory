@@ -4,12 +4,15 @@ import type { InventoryItem } from './db/schema';
 import { getAllItems } from './db/inventory';
 import { ItemList } from './components/ItemList';
 import { AddItemForm } from './components/AddItemForm';
+import { ItemDetail } from './components/ItemDetail';
 import { Plus, Search, X } from 'lucide-react';
 
 function App() {
   const [items, setItems] = useState<InventoryItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
+  const [selectedItem, setSelectedItem] = useState<InventoryItem | null>(null);
+  const [isEditing, setIsEditing] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
 
   const loadItems = useCallback(async () => {
@@ -28,9 +31,17 @@ function App() {
     loadItems();
   }, [loadItems]);
 
-  const handleItemAdded = () => {
+  const handleItemAddedOrUpdated = () => {
     setShowForm(false);
+    setIsEditing(false);
+    setSelectedItem(null);
     loadItems();
+  };
+
+  const handleEdit = (item: InventoryItem) => {
+    setSelectedItem(item);
+    setIsEditing(true);
+    setShowForm(true);
   };
 
   const filteredItems = useMemo(() => {
@@ -48,7 +59,7 @@ function App() {
         <div className="header-top">
           <h1>우리집 인벤토리</h1>
         </div>
-        {!showForm && (
+        {!showForm && !selectedItem && (
           <div className="search-container">
             <Search size={18} className="search-icon" />
             <input
@@ -73,15 +84,26 @@ function App() {
       <main>
         {showForm ? (
           <AddItemForm 
-            onItemAdded={handleItemAdded} 
-            onCancel={() => setShowForm(false)} 
+            onItemAdded={handleItemAddedOrUpdated} 
+            onCancel={() => {
+              setShowForm(false);
+              setIsEditing(false);
+            }} 
+            initialItem={isEditing ? selectedItem || undefined : undefined}
+          />
+        ) : selectedItem ? (
+          <ItemDetail 
+            item={selectedItem} 
+            onClose={() => setSelectedItem(null)}
+            onEdit={handleEdit}
+            onDeleted={handleItemAddedOrUpdated}
           />
         ) : (
           <>
             {loading ? (
               <p className="loading-state">인벤토리를 불러오는 중...</p>
             ) : (
-              <ItemList items={filteredItems} />
+              <ItemList items={filteredItems} onItemClick={setSelectedItem} />
             )}
             <button 
               className="fab" 
