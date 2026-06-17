@@ -5,7 +5,8 @@ import { getAllItems } from './db/inventory';
 import { ItemList } from './components/ItemList';
 import { AddItemForm } from './components/AddItemForm';
 import { ItemDetail } from './components/ItemDetail';
-import { Plus, Search, X } from 'lucide-react';
+import { Plus, Search, X, Download, Upload } from 'lucide-react';
+import { exportData, importData } from './utils/backup';
 
 function App() {
   const [items, setItems] = useState<InventoryItem[]>([]);
@@ -58,6 +59,13 @@ function App() {
       <header>
         <div className="header-top">
           <h1>우리집 인벤토리</h1>
+          <div className="backup-actions">
+            <button onClick={exportData} title="데이터 백업" className="icon-btn"><Download size={20} /></button>
+            <label className="icon-btn" title="데이터 복구">
+              <Upload size={20} />
+              <input type="file" onChange={(e) => e.target.files && importData(e.target.files[0]).then(loadItems)} accept=".json" style={{display: 'none'}} />
+            </label>
+          </div>
         </div>
         {!showForm && !selectedItem && (
           <div className="search-container">
