@@ -11,15 +11,16 @@ interface AddItemFormProps {
 }
 
 const COMMON_LOCATIONS = [
-  'Kitchen',
-  'Pantry',
-  'Living Room',
-  'Bedroom',
-  'Bathroom',
-  'Garage',
-  'Basement',
-  'Attic',
-  'Office'
+  '주방',
+  '냉장고',
+  '냉동실',
+  '팬트리',
+  '거실',
+  '침실',
+  '욕실',
+  '현관',
+  '베란다',
+  '창고'
 ];
 
 export const AddItemForm: React.FC<AddItemFormProps> = ({ onItemAdded, onCancel }) => {
@@ -43,7 +44,7 @@ export const AddItemForm: React.FC<AddItemFormProps> = ({ onItemAdded, onCancel 
         setImage(resizedImage);
       } catch (error) {
         console.error('Failed to resize image:', error);
-        alert('Failed to process image.');
+        alert('이미지 처리 중 오류가 발생했습니다.');
       } finally {
         setIsResizing(false);
       }
@@ -53,7 +54,7 @@ export const AddItemForm: React.FC<AddItemFormProps> = ({ onItemAdded, onCancel 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim()) {
-      alert('Name is required');
+      alert('품목 이름은 필수입니다.');
       return;
     }
 
@@ -76,14 +77,14 @@ export const AddItemForm: React.FC<AddItemFormProps> = ({ onItemAdded, onCancel 
       onItemAdded();
     } catch (error) {
       console.error('Failed to add item:', error);
-      alert('Failed to save item.');
+      alert('저장 중 오류가 발생했습니다.');
     }
   };
 
   return (
     <form className="add-item-form" onSubmit={handleSubmit}>
       <div className="form-header">
-        <h2>Add New Item</h2>
+        <h2>새 품목 추가</h2>
         <button type="button" className="icon-button" onClick={onCancel}>
           <X size={24} />
         </button>
@@ -101,11 +102,11 @@ export const AddItemForm: React.FC<AddItemFormProps> = ({ onItemAdded, onCancel 
           ) : (
             <div className="image-placeholder">
               {isResizing ? (
-                <span>Processing...</span>
+                <span>처리 중...</span>
               ) : (
                 <>
                   <Camera size={32} />
-                  <span>Tap to take a photo or upload</span>
+                  <span>사진 촬영 또는 업로드</span>
                 </>
               )}
             </div>
@@ -123,30 +124,30 @@ export const AddItemForm: React.FC<AddItemFormProps> = ({ onItemAdded, onCancel 
       </div>
 
       <div className="form-group">
-        <label htmlFor="name">Name *</label>
+        <label htmlFor="name">이름 *</label>
         <input
           id="name"
           type="text"
           value={name}
           onChange={(e) => setName(e.target.value)}
-          placeholder="What is this item?"
+          placeholder="무엇인가요?"
           required
         />
       </div>
 
       <div className="form-group">
-        <label htmlFor="description">Description</label>
+        <label htmlFor="description">설명</label>
         <textarea
           id="description"
           value={description}
           onChange={(e) => setDescription(e.target.value)}
-          placeholder="Brief description"
+          placeholder="간단한 설명"
           rows={2}
         />
       </div>
 
       <div className="form-group">
-        <label htmlFor="location">Location</label>
+        <label htmlFor="location">위치</label>
         <div className="location-inputs">
           <select
             id="location"
@@ -156,20 +157,20 @@ export const AddItemForm: React.FC<AddItemFormProps> = ({ onItemAdded, onCancel 
               if (e.target.value !== 'Other') setCustomLocation('');
             }}
           >
-            <option value="">Select location...</option>
+            <option value="">위치 선택...</option>
             {COMMON_LOCATIONS.map((loc) => (
               <option key={loc} value={loc}>
                 {loc}
               </option>
             ))}
-            <option value="Other">Other...</option>
+            <option value="Other">직접 입력...</option>
           </select>
-          {(location === 'Other' || !COMMON_LOCATIONS.includes(location) && location !== '') && (
+          {(location === 'Other' || (!COMMON_LOCATIONS.includes(location) && location !== '')) && (
             <input
               type="text"
               value={customLocation}
               onChange={(e) => setCustomLocation(e.target.value)}
-              placeholder="Enter custom location"
+              placeholder="위치를 입력하세요"
               className="mt-2"
             />
           )}
@@ -178,7 +179,7 @@ export const AddItemForm: React.FC<AddItemFormProps> = ({ onItemAdded, onCancel 
 
       <div className="form-row">
         <div className="form-group">
-          <label htmlFor="purchaseDate">Purchase Date</label>
+          <label htmlFor="purchaseDate">구매일</label>
           <input
             id="purchaseDate"
             type="date"
@@ -187,7 +188,7 @@ export const AddItemForm: React.FC<AddItemFormProps> = ({ onItemAdded, onCancel 
           />
         </div>
         <div className="form-group">
-          <label htmlFor="expiryDate">Expiry Date</label>
+          <label htmlFor="expiryDate">만료일</label>
           <input
             id="expiryDate"
             type="date"
@@ -198,23 +199,23 @@ export const AddItemForm: React.FC<AddItemFormProps> = ({ onItemAdded, onCancel 
       </div>
 
       <div className="form-group">
-        <label htmlFor="memo">Memo</label>
+        <label htmlFor="memo">메모</label>
         <textarea
           id="memo"
           value={memo}
           onChange={(e) => setMemo(e.target.value)}
-          placeholder="Additional notes"
+          placeholder="추가 참고 사항"
           rows={3}
         />
       </div>
 
       <div className="form-actions">
         <button type="button" className="btn btn-secondary" onClick={onCancel}>
-          Cancel
+          취소
         </button>
         <button type="submit" className="btn btn-primary">
           <Save size={18} />
-          Save Item
+          저장하기
         </button>
       </div>
     </form>

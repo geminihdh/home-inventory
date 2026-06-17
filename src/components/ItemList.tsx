@@ -9,8 +9,8 @@ export function ItemList({ items }: ItemListProps) {
   if (items.length === 0) {
     return (
       <div className="empty-state">
-        <p>No items in your inventory yet.</p>
-        <p>Add some items to get started!</p>
+        <p>항목을 찾을 수 없습니다.</p>
+        <p>검색어를 확인하거나 새로운 항목을 추가해보세요!</p>
       </div>
     );
   }
