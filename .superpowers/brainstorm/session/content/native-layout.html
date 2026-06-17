@@ -1,0 +1,57 @@
+<h2>네이티브 앱 화면 및 위젯 제안</h2>
+<p class="subtitle">네이티브 기능(위젯, 푸시 알림)이 포함된 앱 레이아웃입니다.</p>
+
+<div class="split">
+  <!-- 메인 앱 화면 -->
+  <div class="mockup">
+    <div class="mockup-header">내 물건 관리 앱 (네이티브)</div>
+    <div class="mockup-body">
+      <div class="section">
+        <h3>유통기한 임박 알림 설정</h3>
+        <div class="mock-input">알림 주기: 3일 전</div>
+        <button class="mock-button">알림 테스트</button>
+      </div>
+      <div class="section">
+        <h3>물건 목록</h3>
+        <div class="mock-input">신라면 (D-3)</div>
+        <div class="mock-input">우유 (만료됨)</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 홈 화면 위젯 -->
+  <div class="mockup">
+    <div class="mockup-header">홈 화면 위젯 (미리보기)</div>
+    <div class="mockup-body" style="background: #eef; padding: 15px; border-radius: 10px;">
+      <div style="font-weight: bold; margin-bottom: 10px;">📦 유통기한 알림</div>
+      <div style="background: white; padding: 8px; border-radius: 5px; margin-bottom: 5px;">신라면 - D-3</div>
+      <div style="background: white; padding: 8px; border-radius: 5px;">우유 - 만료!</div>
+    </div>
+  </div>
+</div>
+
+<div class="section" style="margin-top: 20px;">
+  <h3>핵심 기능 체크리스트</h3>
+  <ul>
+    <li><strong>로컬 파일 저장:</strong> 휴대폰 데이터 공간에 직접 파일 저장 (데이터 안전)</li>
+    <li><strong>위젯:</strong> 홈 화면에서 즉시 확인 가능</li>
+    <li><strong>푸시 알림:</strong> 기한 임박 시 스마트폰 상단 알림</li>
+  </ul>
+</div>
+
+<div class="options">
+  <div class="option" data-choice="approve" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="content">
+      <h3>이 구성으로 설계 진행</h3>
+      <p>기능이 마음에 듭니다. 설계 명세서 작성을 시작하세요.</p>
+    </div>
+  </div>
+  <div class="option" data-choice="modify" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="content">
+      <h3>수정 요청</h3>
+      <p>위젯이나 알림 기능에 대해 추가하고 싶은 점이 있습니다.</p>
+    </div>
+  </div>
+</div>
