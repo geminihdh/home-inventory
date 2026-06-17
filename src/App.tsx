@@ -60,7 +60,7 @@ function App() {
         <div className="header-top">
           <h1>우리집 인벤토리</h1>
           <div className="backup-actions">
-            <button onClick={exportData} title="데이터 백업" className="icon-btn"><Download size={20} /></button>
+            <button onClick={() => exportData()} title="데이터 백업" className="icon-btn"><Download size={20} /></button>
             <label className="icon-btn" title="데이터 복구">
               <Upload size={20} />
               <input type="file" onChange={(e) => e.target.files && importData(e.target.files[0]).then(loadItems)} accept=".json" style={{display: 'none'}} />

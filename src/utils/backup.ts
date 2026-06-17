@@ -1,5 +1,5 @@
 import { getAllItems, addItem } from '../db/inventory';
-import { InventoryItem } from '../db/schema';
+import type { InventoryItem } from '../db/schema';
 
 export async function exportData(
   downloadFn: (blob: Blob, name: string) => void = (blob, name) => {
