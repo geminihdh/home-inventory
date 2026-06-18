@@ -20,11 +20,13 @@ function App() {
   const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
-    const unsubscribe = subscribeToAuthChanges((u) => {
-      setUser(u);
-      setLoading(false); // 인증 상태 확인 완료 시 무조건 로딩 해제
+    handleRedirect().then(() => {
+      const unsubscribe = subscribeToAuthChanges((u) => {
+        setUser(u);
+        setLoading(false);
+      });
+      return () => unsubscribe();
     });
-    return () => unsubscribe();
   }, []);
 
   useEffect(() => {
