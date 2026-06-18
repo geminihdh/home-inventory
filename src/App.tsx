@@ -7,7 +7,7 @@ import { AddItemForm } from './components/AddItemForm';
 import { ItemDetail } from './components/ItemDetail';
 import { Login } from './components/Login';
 import { Plus, Search, X, LogOut } from 'lucide-react';
-import { subscribeToAuthChanges, logout } from './services/auth';
+import { subscribeToAuthChanges, logout, handleRedirect } from './services/auth';
 import type { User } from 'firebase/auth';
 
 function App() {
