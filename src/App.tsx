@@ -7,7 +7,8 @@ import { AddItemForm } from './components/AddItemForm';
 import { ItemDetail } from './components/ItemDetail';
 import { Login } from './components/Login';
 import { Plus, Search, X, LogOut } from 'lucide-react';
-import { subscribeToAuthChanges, logout } from './services/auth';
+import { subscribeToAuthChanges, logout, getRedirectResult } from './services/auth';
+import { auth } from './services/firebase';
 import type { User } from 'firebase/auth';
 
 function App() {
@@ -18,10 +19,6 @@ function App() {
   const [selectedItem, setSelectedItem] = useState<InventoryItem | null>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-
-import { subscribeToAuthChanges, logout, getRedirectResult } from './services/auth';
-import { auth } from './services/firebase';
-// ...
 
   useEffect(() => {
     let unsubscribe: () => void;
@@ -135,11 +132,7 @@ import { auth } from './services/firebase';
           />
         ) : (
           <>
-            {loading ? (
-              <p className="loading-state">인벤토리를 불러오는 중...</p>
-            ) : (
-              <ItemList items={filteredItems} onItemClick={setSelectedItem} />
-            )}
+            <ItemList items={filteredItems} onItemClick={setSelectedItem} />
             <button 
               className="fab" 
               onClick={() => setShowForm(true)}
