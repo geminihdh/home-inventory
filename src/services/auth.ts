@@ -8,4 +8,3 @@ export const logout = () => signOut(auth);
 export const subscribeToAuthChanges = (callback: (user: User | null) => void) => {
   return onAuthStateChanged(auth, callback);
 };
-};
