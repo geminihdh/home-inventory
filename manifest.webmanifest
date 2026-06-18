@@ -1,1 +1,0 @@
-{"name":"우리집 물건 관리","short_name":"홈인벤토리","description":"개인용 물건 관리 앱","start_url":"/home-inventory/","display":"standalone","background_color":"#ffffff","theme_color":"#ffffff","lang":"en","scope":"/home-inventory/","icons":[{"src":"icons.svg","sizes":"any","type":"image/svg+xml","purpose":"any maskable"}]}
