@@ -11,9 +11,12 @@ import type { User } from 'firebase/auth';
 const provider = new GoogleAuthProvider();
 
 // 리디렉션 결과를 처리하는 함수
+let isRedirectProcessed = false;
 export const handleRedirect = async () => {
+  if (isRedirectProcessed) return;
   try {
     await getRedirectResult(auth);
+    isRedirectProcessed = true;
     console.log("Redirect result processed");
   } catch (error) {
     console.error("Auth redirect error:", error);
