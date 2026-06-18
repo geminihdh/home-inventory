@@ -1,5 +1,6 @@
 import { exportData, importData } from '../backup';
 import { getAllItems, addItem } from '../../db/inventory';
+import { InventoryItem } from '../../db/schema';
 import { vi, describe, test, expect, beforeEach } from 'vitest';
 
 vi.mock('../../db/inventory');
