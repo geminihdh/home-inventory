@@ -19,12 +19,28 @@ function App() {
   const [isEditing, setIsEditing] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
 
+import { subscribeToAuthChanges, logout, getRedirectResult } from './services/auth';
+import { auth } from './services/firebase';
+// ...
+
   useEffect(() => {
-    const unsubscribe = subscribeToAuthChanges((u) => {
-      setUser(u);
+    let unsubscribe: () => void;
+    
+    // 1. 리디렉션 처리 먼저 확실하게 수행
+    getRedirectResult(auth).then(() => {
+      // 2. 그 다음 상태 구독 시작
+      unsubscribe = subscribeToAuthChanges((u) => {
+        setUser(u);
+        setLoading(false);
+      });
+    }).catch((e) => {
+      console.error("Auth init error:", e);
       setLoading(false);
     });
-    return () => unsubscribe();
+
+    return () => {
+      if (unsubscribe) unsubscribe();
+    };
   }, []);
 
   useEffect(() => {
