@@ -3,6 +3,7 @@ import { signInWithGoogle } from '../services/auth';
 
 export const Login: React.FC = () => {
   const handleLogin = async () => {
+    alert("로그인 버튼 클릭됨!");
     try {
       console.log("로그인 시도 시작");
       await signInWithGoogle();
@@ -18,6 +19,7 @@ export const Login: React.FC = () => {
       <h2>내 물건 관리 시작하기</h2>
       <p>기기 간 동기화를 위해 로그인이 필요합니다.</p>
       <button 
+        type="button"
         onClick={handleLogin} 
         style={{ 
           padding: '10px 20px', 
