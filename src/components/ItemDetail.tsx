@@ -1,7 +1,7 @@
 import React from 'react';
 import { X, Edit2, Trash2, Calendar, MapPin, FileText } from 'lucide-react';
 import type { InventoryItem } from '../db/schema';
-import { deleteItem } from '../db/inventory';
+import { deleteItemFromFirebase } from '../db/inventory';
 
 interface ItemDetailProps {
   item: InventoryItem;
@@ -14,7 +14,7 @@ export const ItemDetail: React.FC<ItemDetailProps> = ({ item, onClose, onEdit, o
   const handleDelete = async () => {
     if (window.confirm('정말 이 항목을 삭제하시겠습니까?')) {
       try {
-        await deleteItem(item.id);
+        await deleteItemFromFirebase(item.id);
         onDeleted();
       } catch (error) {
         console.error('Failed to delete item:', error);

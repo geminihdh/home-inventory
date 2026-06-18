@@ -1,0 +1,1 @@
+﻿# Firebase Sync Todos`n`n- [x] Task 1: Firebase 프로젝트 설정 및 SDK 설치`n- [x] Task 2: Firebase Auth (Google 로그인) 구현`n- [x] Task 3: Firebase Storage 이미지 업로드 서비스 구현`n- [x] Task 4: Firestore 인벤토리 서비스 리팩토링`n- [x] Task 5: App.tsx 통합 및 최종 테스트

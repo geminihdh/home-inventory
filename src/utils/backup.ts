@@ -25,7 +25,7 @@ export async function importData(file: File): Promise<void> {
     // User request says "add items back".
     try {
       await addItem(item);
-    } catch (e) {
+    } catch {
       console.warn('Item already exists, skipping:', item.id);
     }
   }

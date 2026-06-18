@@ -1,14 +1,16 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { Camera, X, Save } from 'lucide-react';
 import type { InventoryItem } from '../db/schema';
-import { addItem, updateItem } from '../db/inventory';
+import { saveItemToFirebase } from '../db/inventory';
 import { resizeImage } from '../utils/image';
+import { uploadImage, base64ToFile } from '../services/imageUpload';
 
 interface AddItemFormProps {
   onItemAdded: () => void;
   onCancel: () => void;
   initialItem?: InventoryItem;
+  userId: string;
 }
 
 const COMMON_LOCATIONS = [
@@ -24,10 +26,15 @@ const COMMON_LOCATIONS = [
   '창고'
 ];
 
-export const AddItemForm: React.FC<AddItemFormProps> = ({ onItemAdded, onCancel, initialItem }) => {
+export const AddItemForm: React.FC<AddItemFormProps> = ({ onItemAdded, onCancel, initialItem, userId }) => {
   const [name, setName] = useState(initialItem?.name || '');
   const [description, setDescription] = useState(initialItem?.description || '');
-  const [location, setLocation] = useState(initialItem?.location || '');
+  const [location, setLocation] = useState(() => {
+    if (initialItem && !COMMON_LOCATIONS.includes(initialItem.location) && initialItem.location !== '') {
+      return 'Other';
+    }
+    return initialItem?.location || '';
+  });
   const [customLocation, setCustomLocation] = useState(
     initialItem && !COMMON_LOCATIONS.includes(initialItem.location) ? initialItem.location : ''
   );
@@ -36,13 +43,8 @@ export const AddItemForm: React.FC<AddItemFormProps> = ({ onItemAdded, onCancel,
   const [memo, setMemo] = useState(initialItem?.memo || '');
   const [image, setImage] = useState<string | null>(initialItem?.image || null);
   const [isResizing, setIsResizing] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
-
-  useEffect(() => {
-    if (initialItem && !COMMON_LOCATIONS.includes(initialItem.location) && initialItem.location !== '') {
-      setLocation('Other');
-    }
-  }, [initialItem]);
 
   const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -67,29 +69,41 @@ export const AddItemForm: React.FC<AddItemFormProps> = ({ onItemAdded, onCancel,
       return;
     }
 
-    const finalLocation = customLocation || location;
-
-    const itemData: InventoryItem = {
-      ...(initialItem || { id: uuidv4(), createdAt: Date.now() }),
-      name: name.trim(),
-      description: description.trim(),
-      location: finalLocation,
-      purchaseDate,
-      expiryDate,
-      memo: memo.trim(),
-      image: image || '',
-    };
+    if (isSaving) return;
+    setIsSaving(true);
 
     try {
-      if (initialItem) {
-        await updateItem(itemData);
-      } else {
-        await addItem(itemData);
+      const finalLocation = customLocation || location;
+      const itemId = initialItem?.id || uuidv4();
+      
+      let imageUrl = image || '';
+      
+      // If image is a new base64 string, upload it to Firebase Storage
+      if (image && image.startsWith('data:')) {
+        const imageFile = base64ToFile(image, `${itemId}.jpg`);
+        imageUrl = await uploadImage(userId, itemId, imageFile);
       }
+
+      const itemData: InventoryItem = {
+        id: itemId,
+        createdAt: initialItem?.createdAt || Date.now(),
+        name: name.trim(),
+        description: description.trim(),
+        location: finalLocation,
+        purchaseDate,
+        expiryDate,
+        memo: memo.trim(),
+        image: imageUrl,
+        userId: userId,
+      };
+
+      await saveItemToFirebase(itemData);
       onItemAdded();
     } catch (error) {
       console.error('Failed to save item:', error);
       alert('저장 중 오류가 발생했습니다.');
+    } finally {
+      setIsSaving(false);
     }
   };
 

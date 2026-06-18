@@ -1,63 +1,143 @@
-<h2>앱 화면 구성 제안</h2>
-<p class="subtitle">실용적인 리스트 중심의 화면 설계입니다.</p>
-
-<div class="mockup">
-  <div class="mockup-header">메인 화면 (물건 목록)</div>
-  <div class="mockup-body">
-    <div style="padding: 10px; background: #f5f5f5; border-bottom: 1px solid #ddd; display: flex; gap: 10px;">
-      <input class="mock-input" placeholder="물건 검색..." style="flex: 1;">
-      <button class="mock-button" style="padding: 5px 15px;">검색</button>
-    </div>
-    
-    <div style="display: flex; flex-direction: column;">
-      <!-- 아이템 1 -->
-      <div style="display: flex; align-items: center; padding: 12px; border-bottom: 1px solid #eee; background: white;">
-        <div class="placeholder" style="width: 50px; height: 50px; border-radius: 4px; margin-right: 15px;">사진</div>
-        <div style="flex: 1;">
-          <div style="font-weight: bold; font-size: 16px;">신라면 (5봉지)</div>
-          <div style="font-size: 12px; color: #666;">위치: 주방 찬장 | 유통기한: 2026.12.31</div>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DB 서비스 비교</title>
+    <style>
+        body {
+            font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+            padding: 20px;
+            background-color: #f8f9fa;
+            color: #333;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            border: 1px solid #e9ecef;
+            display: flex;
+            flex-direction: column;
+        }
+        .card.recommended {
+            border: 2px solid #3ecf8e;
+            position: relative;
+        }
+        .badge {
+            position: absolute;
+            top: -12px;
+            right: 20px;
+            background: #3ecf8e;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+        h2 {
+            margin-top: 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .service-logo {
+            width: 32px;
+            height: 32px;
+        }
+        .feature-list {
+            list-style: none;
+            padding: 0;
+            margin: 20px 0;
+            flex-grow: 1;
+        }
+        .feature-list li {
+            padding: 8px 0;
+            border-bottom: 1px solid #f1f3f5;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .feature-list li::before {
+            content: "✓";
+            color: #3ecf8e;
+            font-weight: bold;
+        }
+        .pros-cons {
+            margin-top: 20px;
+            font-size: 0.9rem;
+        }
+        .pros { color: #2b8a3e; }
+        .cons { color: #c92a2a; }
+        .storage-warning {
+            margin-top: 30px;
+            padding: 20px;
+            background: #fff4e6;
+            border-left: 4px solid #fd7e14;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>기기 간 동기화를 위한 추천 DB 서비스</h1>
+            <p>서버 구축 없이 무료로 사용할 수 있는 가장 좋은 방법들입니다.</p>
         </div>
-        <div style="color: #ff4d4f; font-weight: bold; font-size: 12px;">D-190</div>
-      </div>
-      
-      <!-- 아이템 2 -->
-      <div style="display: flex; align-items: center; padding: 12px; border-bottom: 1px solid #eee; background: white;">
-        <div class="placeholder" style="width: 50px; height: 50px; border-radius: 4px; margin-right: 15px;">사진</div>
-        <div style="flex: 1;">
-          <div style="font-weight: bold; font-size: 16px;">AA 건전지</div>
-          <div style="font-size: 12px; color: #666;">위치: 거실 TV장 서랍 | 구매: 2026.05.10</div>
+
+        <div class="comparison-grid">
+            <!-- Supabase -->
+            <div class="card recommended">
+                <span class="badge">추천</span>
+                <h2><img src="https://supabase.com/dashboard/img/supabase-logo.svg" class="service-logo" alt=""> Supabase</h2>
+                <p>관계형 DB(PostgreSQL) 기반의 오픈소스 Firebase 대안</p>
+                <ul class="feature-list">
+                    <li>무료 DB 용량 500MB</li>
+                    <li>이미지 저장소(Storage) 1GB 무료</li>
+                    <li>간편한 이메일/소셜 로그인 지원</li>
+                    <li>SQL을 그대로 사용 가능</li>
+                </ul>
+                <div class="pros-cons">
+                    <p class="pros"><strong>장점:</strong> 데이터 구조화가 쉽고, 나중에 확장성이 매우 좋습니다.</p>
+                    <p class="cons"><strong>단점:</strong> 초기 설정이 Firebase보다 약간 더 있을 수 있습니다.</p>
+                </div>
+            </div>
+
+            <!-- Firebase -->
+            <div class="card">
+                <h2><img src="https://www.gstatic.com/devrel-devsite/prod/v77399587889163d88b48f6cfbe317df8a635ef8ec0e4c62923f668541e3d0985/firebase/images/favicon.png" class="service-logo" alt=""> Firebase</h2>
+                <p>구글에서 제공하는 NoSQL 기반 실시간 DB</p>
+                <ul class="feature-list">
+                    <li>실시간 데이터 동기화 최적화</li>
+                    <li>이미지 저장소 5GB 무료</li>
+                    <li>전 세계적으로 가장 많이 쓰임</li>
+                    <li>로그인 연동이 매우 강력함</li>
+                </ul>
+                <div class="pros-cons">
+                    <p class="pros"><strong>장점:</strong> 실시간 동기화가 매우 빠르고 문서화가 잘 되어 있습니다.</p>
+                    <p class="cons"><strong>단점:</strong> 데이터가 복잡해지면 관리(쿼리)가 어려울 수 있습니다.</p>
+                </div>
+            </div>
         </div>
-      </div>
-    </div>
-    
-    <div style="position: absolute; bottom: 20px; right: 20px;">
-      <button class="mock-button" style="width: 50px; height: 50px; border-radius: 25px; font-size: 24px; background: #1890ff; color: white; border: none; box-shadow: 0 4px 10px rgba(0,0,0,0.2);">+</button>
-    </div>
-  </div>
-</div>
 
-<div class="section" style="margin-top: 30px;">
-  <h3>주요 기능 설명</h3>
-  <ul>
-    <li><strong>메인 화면:</strong> 모든 물건을 리스트로 한눈에 봅니다. 썸네일로 바로 확인이 가능합니다.</li>
-    <li><strong>상태 표시:</strong> 유통기한이 얼마 남지 않은 물건은 상단에 빨간색으로 남은 일수(D-Day)를 보여줍니다.</li>
-    <li><strong>검색 및 필터:</strong> 이름이나 장소로 빠르게 검색할 수 있습니다.</li>
-  </ul>
-</div>
-
-<div class="options">
-  <div class="option" data-choice="approve" onclick="toggleSelect(this)">
-    <div class="letter">A</div>
-    <div class="content">
-      <h3>이대로 진행하기</h3>
-      <p>구성이 마음에 듭니다. 다음 단계로 넘어가요.</p>
+        <div class="storage-warning">
+            <h3>⚠️ 이미지 저장 방식 개선 제안</h3>
+            <p>현재 <strong>Base64</strong> 방식으로 DB에 직접 이미지를 저장하면 금방 용량이 꽉 차고 로딩 속도가 느려집니다. </p>
+            <p>어떤 서비스를 선택하든 <strong>이미지는 클라우드 스토리지에 올리고, DB에는 해당 이미지의 URL만 저장</strong>하는 방식이 훨씬 효율적입니다.</p>
+        </div>
     </div>
-  </div>
-  <div class="option" data-choice="modify" onclick="toggleSelect(this)">
-    <div class="letter">B</div>
-    <div class="content">
-      <h3>수정 요청</h3>
-      <p>조금 더 고치고 싶은 부분이 있습니다.</p>
-    </div>
-  </div>
-</div>
+</body>
+</html>

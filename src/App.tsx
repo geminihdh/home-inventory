@@ -1,14 +1,17 @@
-import { useEffect, useState, useCallback, useMemo } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import './App.css';
 import type { InventoryItem } from './db/schema';
-import { getAllItems } from './db/inventory';
+import { syncItems } from './db/inventory';
 import { ItemList } from './components/ItemList';
 import { AddItemForm } from './components/AddItemForm';
 import { ItemDetail } from './components/ItemDetail';
-import { Plus, Search, X, Download, Upload } from 'lucide-react';
-import { exportData, importData } from './utils/backup';
+import { Login } from './components/Login';
+import { Plus, Search, X, LogOut } from 'lucide-react';
+import { subscribeToAuthChanges, logout } from './services/auth';
+import type { User } from 'firebase/auth';
 
 function App() {
+  const [user, setUser] = useState<User | null>(null);
   const [items, setItems] = useState<InventoryItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
@@ -16,27 +19,28 @@ function App() {
   const [isEditing, setIsEditing] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
 
-  const loadItems = useCallback(async () => {
-    try {
-      setLoading(true);
-      const allItems = await getAllItems();
-      setItems(allItems);
-    } catch (error) {
-      console.error('Failed to load items:', error);
-    } finally {
-      setLoading(false);
-    }
+  useEffect(() => {
+    const unsubscribe = subscribeToAuthChanges((u) => {
+      setUser(u);
+      setLoading(false); // 인증 상태 확인 완료 시 무조건 로딩 해제
+    });
+    return () => unsubscribe();
   }, []);
 
   useEffect(() => {
-    loadItems();
-  }, [loadItems]);
+    if (user) {
+      const unsubscribe = syncItems(user.uid, (syncedItems) => {
+        setItems(syncedItems);
+        setLoading(false);
+      });
+      return () => unsubscribe();
+    }
+  }, [user]);
 
   const handleItemAddedOrUpdated = () => {
     setShowForm(false);
     setIsEditing(false);
     setSelectedItem(null);
-    loadItems();
   };
 
   const handleEdit = (item: InventoryItem) => {
@@ -54,17 +58,19 @@ function App() {
     );
   }, [items, searchQuery]);
 
+  if (!user && !loading) {
+    return <Login />;
+  }
+
   return (
     <div className="app-container">
       <header>
         <div className="header-top">
           <h1>우리집 인벤토리</h1>
-          <div className="backup-actions">
-            <button onClick={() => exportData()} title="데이터 백업" className="icon-btn"><Download size={20} /></button>
-            <label className="icon-btn" title="데이터 복구">
-              <Upload size={20} />
-              <input type="file" onChange={(e) => e.target.files && importData(e.target.files[0]).then(loadItems)} accept=".json" style={{display: 'none'}} />
-            </label>
+          <div className="header-actions">
+            <button onClick={logout} title="로그아웃" className="icon-btn">
+              <LogOut size={20} />
+            </button>
           </div>
         </div>
         {!showForm && !selectedItem && (
@@ -98,6 +104,7 @@ function App() {
               setIsEditing(false);
             }} 
             initialItem={isEditing ? selectedItem || undefined : undefined}
+            userId={user?.uid || ''}
           />
         ) : selectedItem ? (
           <ItemDetail 

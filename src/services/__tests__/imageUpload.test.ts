@@ -22,9 +22,11 @@ describe('imageUpload service', () => {
     const mockSnapshot = { ref: mockRef };
     const mockUrl = 'https://firebasestorage.googleapis.com/v0/b/test/o/test.png?alt=media';
 
-    (ref as any).mockReturnValue(mockRef);
-    (uploadBytes as any).mockResolvedValue(mockSnapshot);
-    (getDownloadURL as any).mockResolvedValue(mockUrl);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    vi.mocked(ref).mockReturnValue(mockRef as any);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    vi.mocked(uploadBytes).mockResolvedValue(mockSnapshot as any);
+    vi.mocked(getDownloadURL).mockResolvedValue(mockUrl);
 
     const url = await uploadImage(userId, itemId, file);
 

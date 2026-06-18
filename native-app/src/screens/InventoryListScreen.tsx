@@ -2,7 +2,14 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, FlatList, StyleSheet, Button } from 'react-native';
 import { InventoryItem, loadInventory } from '../services/storage';
 
-export default function InventoryListScreen({ navigation }: any) {
+interface InventoryListScreenProps {
+  navigation: {
+    addListener: (event: string, callback: () => void) => () => void;
+    navigate: (screen: string) => void;
+  };
+}
+
+export default function InventoryListScreen({ navigation }: InventoryListScreenProps) {
   const [items, setItems] = useState<InventoryItem[]>([]);
 
   useEffect(() => {

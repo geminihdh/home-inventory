@@ -3,7 +3,13 @@ import { View, Text, TextInput, Button, StyleSheet } from 'react-native';
 import { saveInventory, loadInventory, InventoryItem } from '../services/storage';
 import { scheduleExpiryNotification } from '../services/notifications';
 
-export default function AddItemScreen({ navigation }: any) {
+interface AddItemScreenProps {
+  navigation: {
+    goBack: () => void;
+  };
+}
+
+export default function AddItemScreen({ navigation }: AddItemScreenProps) {
   const [name, setName] = useState('');
   const [expiryDate, setExpiryDate] = useState('');
 
