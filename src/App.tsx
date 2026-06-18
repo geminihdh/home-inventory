@@ -7,7 +7,7 @@ import { AddItemForm } from './components/AddItemForm';
 import { ItemDetail } from './components/ItemDetail';
 import { Login } from './components/Login';
 import { Plus, Search, X, LogOut } from 'lucide-react';
-import { subscribeToAuthChanges, logout, handleRedirect } from './services/auth';
+import { subscribeToAuthChanges, logout } from './services/auth';
 import type { User } from 'firebase/auth';
 
 function App() {
@@ -20,15 +20,11 @@ function App() {
   const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
-    handleRedirect().then(() => {
-      console.log("Handle redirect finished, subscribing...");
-      const unsubscribe = subscribeToAuthChanges((u) => {
-        console.log("App received user UID:", u ? u.uid : "null");
-        setUser(u);
-        setLoading(false);
-      });
-      return () => unsubscribe();
+    const unsubscribe = subscribeToAuthChanges((u) => {
+      setUser(u);
+      setLoading(false);
     });
+    return () => unsubscribe();
   }, []);
 
   useEffect(() => {
