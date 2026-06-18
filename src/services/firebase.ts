@@ -21,10 +21,10 @@ export const storage = getStorage(app);
 // 인증 지속성을 명시적으로 설정
 setPersistence(auth, browserLocalPersistence).catch(console.error);
 
-enableIndexedDbPersistence(db).catch((err) => {
-  if (err.code === 'failed-precondition') {
-    console.warn('Multiple tabs open, persistence can only be enabled in one tab at a time.');
-  } else if (err.code === 'unimplemented') {
-    console.warn('The current browser does not support all of the features required to enable persistence');
-  }
-});
+// enableIndexedDbPersistence(db).catch((err) => {
+//   if (err.code === 'failed-precondition') {
+//     console.warn('Multiple tabs open, persistence can only be enabled in one tab at a time.');
+//   } else if (err.code === 'unimplemented') {
+//     console.warn('The current browser does not support all of the features required to enable persistence');
+//   }
+// });
