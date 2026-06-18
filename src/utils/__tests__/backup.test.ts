@@ -10,7 +10,19 @@ describe('backup', () => {
   });
 
   test('exportData should fetch items and trigger download', async () => {
-    const mockItems = [{ id: '1', name: 'Item 1', location: 'Kitchen', createdAt: new Date().toISOString() }];
+    const mockItems: InventoryItem[] = [{ 
+      id: '1', 
+      name: 'Item 1', 
+      location: 'Kitchen', 
+      createdAt: Date.now(), 
+      image: '', 
+      description: '', 
+      purchaseDate: '', 
+      expiryDate: '', 
+      memo: '',
+      userId: 'user1',
+      updatedAt: Date.now()
+    }];
     vi.mocked(getAllItems).mockResolvedValue(mockItems);
 
     const mockDownloadFn = vi.fn();
@@ -25,7 +37,19 @@ describe('backup', () => {
   });
 
   test('importData should parse JSON and add items', async () => {
-    const mockItems = [{ id: '1', name: 'Item 1', location: 'Kitchen', createdAt: new Date().toISOString() }];
+    const mockItems: InventoryItem[] = [{ 
+      id: '1', 
+      name: 'Item 1', 
+      location: 'Kitchen', 
+      createdAt: Date.now(), 
+      image: '', 
+      description: '', 
+      purchaseDate: '', 
+      expiryDate: '', 
+      memo: '',
+      userId: 'user1',
+      updatedAt: Date.now()
+    }];
     const file = new File([JSON.stringify(mockItems)], 'backup.json', { type: 'application/json' });
     
     vi.mocked(addItem).mockResolvedValue(undefined as unknown as void);
