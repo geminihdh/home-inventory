@@ -21,7 +21,9 @@ function App() {
 
   useEffect(() => {
     handleRedirect().then(() => {
+      console.log("Handle redirect finished, subscribing...");
       const unsubscribe = subscribeToAuthChanges((u) => {
+        console.log("App received user UID:", u ? u.uid : "null");
         setUser(u);
         setLoading(false);
       });

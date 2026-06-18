@@ -26,5 +26,8 @@ export const handleRedirect = async () => {
 export const signInWithGoogle = () => signInWithRedirect(auth, provider);
 export const logout = () => signOut(auth);
 export const subscribeToAuthChanges = (callback: (user: User | null) => void) => {
-  return onAuthStateChanged(auth, callback);
+  return onAuthStateChanged(auth, (user) => {
+    console.log("onAuthStateChanged triggered. User UID:", user ? user.uid : "null");
+    callback(user);
+  });
 };
