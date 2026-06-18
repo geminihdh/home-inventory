@@ -8,4 +8,6 @@ export interface InventoryItem {
   expiryDate: string;
   memo: string;
   createdAt: number;
+  userId?: string;
+  updatedAt?: number;
 }
