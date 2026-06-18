@@ -58,7 +58,11 @@ function App() {
     );
   }, [items, searchQuery]);
 
-  if (!user && !loading) {
+  if (loading) {
+    return <div className="loading-state">인증 확인 중...</div>;
+  }
+
+  if (!user) {
     return <Login />;
   }
 
