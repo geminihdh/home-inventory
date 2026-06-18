@@ -9,8 +9,7 @@ import {
   deleteDoc, 
   onSnapshot, 
   query, 
-  where,
-  orderBy
+  where
 } from 'firebase/firestore';
 
 const DB_NAME = 'home-inventory';
@@ -68,8 +67,7 @@ export async function deleteItem(id: string): Promise<void> {
 export const syncItems = (userId: string, callback: (items: InventoryItem[]) => void) => {
   const q = query(
     collection(db, COLLECTION_NAME), 
-    where('userId', '==', userId),
-    orderBy('createdAt', 'desc')
+    where('userId', '==', userId)
   );
   
   return onSnapshot(q, (snapshot) => {
