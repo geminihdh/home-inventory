@@ -21,6 +21,7 @@ export const Login: React.FC = () => {
       <button 
         type="button"
         onClick={handleLogin} 
+        onTouchStart={handleLogin}
         style={{ 
           padding: '10px 20px', 
           backgroundColor: '#4285F4', 
