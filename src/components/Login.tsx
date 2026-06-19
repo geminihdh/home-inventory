@@ -3,7 +3,6 @@ import { signInWithGoogle } from '../services/auth';
 
 export const Login: React.FC = () => {
   const handleLogin = async () => {
-    alert("로그인 버튼 클릭됨!");
     try {
       console.log("로그인 시도 시작");
       await signInWithGoogle();
@@ -21,7 +20,6 @@ export const Login: React.FC = () => {
       <button 
         type="button"
         onClick={handleLogin} 
-        onTouchStart={handleLogin}
         style={{ 
           padding: '10px 20px', 
           backgroundColor: '#4285F4', 

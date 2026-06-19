@@ -21,17 +21,20 @@ function App() {
   const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
-    let unsubscribe: () => void;
-    
-    // 1. 리디렉션 처리 먼저 확실하게 수행
-    getRedirectResult(auth).then(() => {
-      // 2. 그 다음 상태 구독 시작
-      unsubscribe = subscribeToAuthChanges((u) => {
-        setUser(u);
-        setLoading(false);
+    // 1. 리디렉션 처리를 백그라운드에서 비동기로 실행 (인증 흐름 차단 방지)
+    getRedirectResult(auth)
+      .then((result) => {
+        if (result) {
+          console.log("리디렉션 로그인 성공:", result.user.email);
+        }
+      })
+      .catch((e) => {
+        console.error("리디렉션 초기화 에러:", e);
       });
-    }).catch((e) => {
-      console.error("Auth init error:", e);
+
+    // 2. 인증 상태 변경 구독 즉시 시작 (기존 세션 유지 및 UI 반응성 보장)
+    const unsubscribe = subscribeToAuthChanges((u) => {
+      setUser(u);
       setLoading(false);
     });
 
