@@ -1,18 +1,14 @@
 import { useEffect, useState, useMemo } from 'react';
 import './App.css';
 import type { InventoryItem } from './db/schema';
-import { syncItems } from './db/inventory';
+import { getAllItems } from './db/inventory';
 import { ItemList } from './components/ItemList';
 import { AddItemForm } from './components/AddItemForm';
 import { ItemDetail } from './components/ItemDetail';
-import { Login } from './components/Login';
-import { Plus, Search, X, LogOut } from 'lucide-react';
-import { subscribeToAuthChanges, logout, getRedirectResult } from './services/auth';
-import { auth } from './services/firebase';
-import type { User } from 'firebase/auth';
+import { Plus, Search, X, Download, Upload } from 'lucide-react';
+import { exportData, importData } from './utils/backup';
 
 function App() {
-  const [user, setUser] = useState<User | null>(null);
   const [items, setItems] = useState<InventoryItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
@@ -20,40 +16,21 @@ function App() {
   const [isEditing, setIsEditing] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
 
+  const loadItems = async () => {
+    const fetchedItems = await getAllItems();
+    setItems(fetchedItems);
+    setLoading(false);
+  };
+
   useEffect(() => {
-    // 1. 리디렉션 처리를 백그라운드에서 비동기로 실행 (인증 흐름 차단 방지)
-    getRedirectResult(auth)
-      .then((result) => {
-        if (result) {
-          console.log("리디렉션 로그인 성공:", result.user.email);
-        }
-      })
-      .catch((e) => {
-        console.error("리디렉션 초기화 에러:", e);
-      });
-
-    // 2. 인증 상태 변경 구독 즉시 시작 (기존 세션 유지 및 UI 반응성 보장)
-    const unsubscribe = subscribeToAuthChanges((u) => {
-      setUser(u);
-      setLoading(false);
-    });
-
-    return () => {
-      if (unsubscribe) unsubscribe();
+    const fetchData = async () => {
+      await loadItems();
     };
+    fetchData();
   }, []);
 
-  useEffect(() => {
-    if (user) {
-      const unsubscribe = syncItems(user.uid, (syncedItems) => {
-        setItems(syncedItems);
-        setLoading(false);
-      });
-      return () => unsubscribe();
-    }
-  }, [user]);
-
-  const handleItemAddedOrUpdated = () => {
+  const handleItemAddedOrUpdated = async () => {
+    await loadItems();
     setShowForm(false);
     setIsEditing(false);
     setSelectedItem(null);
@@ -63,6 +40,30 @@ function App() {
     setSelectedItem(item);
     setIsEditing(true);
     setShowForm(true);
+  };
+
+  const handleExport = async () => {
+    const data = await exportData();
+    const blob = new Blob([data], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `inventory-backup-${new Date().toISOString()}.json`;
+    a.click();
+  };
+
+  const handleImport = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = async (e) => {
+        const text = e.target?.result as string;
+        await importData(text);
+        await loadItems();
+        alert('데이터를 성공적으로 불러왔습니다.');
+      };
+      reader.readAsText(file);
+    }
   };
 
   const filteredItems = useMemo(() => {
@@ -75,11 +76,7 @@ function App() {
   }, [items, searchQuery]);
 
   if (loading) {
-    return <div className="loading-state">인증 확인 중...</div>;
-  }
-
-  if (!user) {
-    return <Login />;
+    return <div className="loading-state">데이터 로딩 중...</div>;
   }
 
   return (
@@ -88,9 +85,13 @@ function App() {
         <div className="header-top">
           <h1>우리집 인벤토리</h1>
           <div className="header-actions">
-            <button onClick={logout} title="로그아웃" className="icon-btn">
-              <LogOut size={20} />
+            <button onClick={handleExport} title="백업 다운로드" className="icon-btn">
+              <Download size={20} />
             </button>
+            <label className="icon-btn" title="데이터 복원">
+              <Upload size={20} />
+              <input type="file" onChange={handleImport} accept=".json" style={{ display: 'none' }} />
+            </label>
           </div>
         </div>
         {!showForm && !selectedItem && (
@@ -124,7 +125,6 @@ function App() {
               setIsEditing(false);
             }} 
             initialItem={isEditing ? selectedItem || undefined : undefined}
-            userId={user?.uid || ''}
           />
         ) : selectedItem ? (
           <ItemDetail 

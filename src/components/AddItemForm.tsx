@@ -2,15 +2,13 @@ import React, { useState, useRef } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { Camera, X, Save } from 'lucide-react';
 import type { InventoryItem } from '../db/schema';
-import { saveItemToFirebase } from '../db/inventory';
+import { addItem, updateItem } from '../db/inventory';
 import { resizeImage } from '../utils/image';
-import { uploadImage, base64ToFile } from '../services/imageUpload';
 
 interface AddItemFormProps {
   onItemAdded: () => void;
   onCancel: () => void;
   initialItem?: InventoryItem;
-  userId: string;
 }
 
 const COMMON_LOCATIONS = [
@@ -26,7 +24,7 @@ const COMMON_LOCATIONS = [
   '창고'
 ];
 
-export const AddItemForm: React.FC<AddItemFormProps> = ({ onItemAdded, onCancel, initialItem, userId }) => {
+export const AddItemForm: React.FC<AddItemFormProps> = ({ onItemAdded, onCancel, initialItem }) => {
   const [name, setName] = useState(initialItem?.name || '');
   const [description, setDescription] = useState(initialItem?.description || '');
   const [location, setLocation] = useState(() => {
@@ -76,14 +74,6 @@ export const AddItemForm: React.FC<AddItemFormProps> = ({ onItemAdded, onCancel,
       const finalLocation = customLocation || location;
       const itemId = initialItem?.id || uuidv4();
       
-      let imageUrl = image || '';
-      
-      // If image is a new base64 string, upload it to Firebase Storage
-      if (image && image.startsWith('data:')) {
-        const imageFile = base64ToFile(image, `${itemId}.jpg`);
-        imageUrl = await uploadImage(userId, itemId, imageFile);
-      }
-
       const itemData: InventoryItem = {
         id: itemId,
         createdAt: initialItem?.createdAt || Date.now(),
@@ -93,11 +83,15 @@ export const AddItemForm: React.FC<AddItemFormProps> = ({ onItemAdded, onCancel,
         purchaseDate,
         expiryDate,
         memo: memo.trim(),
-        image: imageUrl,
-        userId: userId,
+        image: image || '',
+        updatedAt: Date.now(),
       };
 
-      await saveItemToFirebase(itemData);
+      if (initialItem) {
+        await updateItem(itemData);
+      } else {
+        await addItem(itemData);
+      }
       onItemAdded();
     } catch (error) {
       console.error('Failed to save item:', error);
