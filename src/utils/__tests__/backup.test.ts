@@ -1,5 +1,5 @@
 import { exportData, importData } from '../backup';
-import { getAllItems, addItem } from '../../db/inventory';
+import { getAllItems, initDB } from '../../db/inventory';
 import type { InventoryItem } from '../../db/schema';
 import { vi, describe, test, expect, beforeEach } from 'vitest';
 
@@ -10,7 +10,7 @@ describe('backup', () => {
     vi.clearAllMocks();
   });
 
-  test('exportData should fetch items and trigger download', async () => {
+  test('exportData should return JSON string of items', async () => {
     const mockItems: InventoryItem[] = [{ 
       id: '1', 
       name: 'Item 1', 
@@ -21,23 +21,17 @@ describe('backup', () => {
       purchaseDate: '', 
       expiryDate: '', 
       memo: '',
-      userId: 'user1',
       updatedAt: Date.now()
     }];
     vi.mocked(getAllItems).mockResolvedValue(mockItems);
 
-    const mockDownloadFn = vi.fn();
-
-    await exportData(mockDownloadFn);
+    const result = await exportData();
 
     expect(getAllItems).toHaveBeenCalled();
-    expect(mockDownloadFn).toHaveBeenCalled();
-    const [blob, name] = mockDownloadFn.mock.calls[0];
-    expect(blob).toBeInstanceOf(Blob);
-    expect(name).toContain('backup');
+    expect(JSON.parse(result)).toEqual(mockItems);
   });
 
-  test('importData should parse JSON and add items', async () => {
+  test('importData should clear and add items to DB', async () => {
     const mockItems: InventoryItem[] = [{ 
       id: '1', 
       name: 'Item 1', 
@@ -48,15 +42,22 @@ describe('backup', () => {
       purchaseDate: '', 
       expiryDate: '', 
       memo: '',
-      userId: 'user1',
       updatedAt: Date.now()
     }];
-    const file = new File([JSON.stringify(mockItems)], 'backup.json', { type: 'application/json' });
     
-    vi.mocked(addItem).mockResolvedValue(undefined as unknown as void);
+    const mockDb = {
+      transaction: vi.fn().mockReturnValue({
+        store: {
+          clear: vi.fn(),
+          add: vi.fn(),
+        },
+        done: Promise.resolve(),
+      }),
+    };
+    vi.mocked(initDB).mockResolvedValue(mockDb as any);
 
-    await importData(file);
+    await importData(JSON.stringify(mockItems));
 
-    expect(addItem).toHaveBeenCalledWith(mockItems[0]);
+    expect(mockDb.transaction).toHaveBeenCalledWith('items', 'readwrite');
   });
 });
